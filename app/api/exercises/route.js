@@ -19,10 +19,16 @@ export async function GET(req) {
     }
 
     if (muscle && muscle !== 'all') {
-      filtered = filtered.filter(ex => 
-        ex.primary_muscles.some(m => m.toLowerCase() === muscle) ||
-        (ex.secondary_muscles && ex.secondary_muscles.some(m => m.toLowerCase() === muscle))
-      );
+      filtered = filtered.filter(ex => {
+        const mLowerCase = muscle.toLowerCase();
+        const primaryMatch = ex.primary_muscles.some(m => 
+          m.toLowerCase().includes(mLowerCase) || (mLowerCase === 'shoulders' && m.toLowerCase().includes('delts'))
+        );
+        const secondaryMatch = ex.secondary_muscles && ex.secondary_muscles.some(m => 
+          m.toLowerCase().includes(mLowerCase) || (mLowerCase === 'shoulders' && m.toLowerCase().includes('delts'))
+        );
+        return primaryMatch || secondaryMatch;
+      });
     }
 
     if (equipment && equipment !== 'all') {
