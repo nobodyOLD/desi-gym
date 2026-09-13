@@ -10,8 +10,7 @@ export const dynamic = 'force-dynamic';
  * API Route handler to get/generate customized workout plans
  */
 export async function POST(req) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createRouteHandlerClient({ cookies });
 
   try {
     // 1. Authenticate user session

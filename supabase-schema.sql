@@ -12,6 +12,7 @@ CREATE TABLE profiles (
   dietary_preference TEXT CHECK (dietary_preference IN ('vegetarian', 'vegan', 'non-vegetarian')),
   fitness_level TEXT CHECK (fitness_level IN ('beginner', 'intermediate', 'advanced')),
   health_conditions TEXT,
+  exercise_preferences JSONB DEFAULT '{"favorites": [], "excluded": []}'::jsonb,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

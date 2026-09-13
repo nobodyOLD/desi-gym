@@ -18,7 +18,7 @@ const groq = new Groq({
  * applies rate limits via Upstash, and streams Groq completions.
  */
 export async function POST(req) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
   try {

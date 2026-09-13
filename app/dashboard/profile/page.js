@@ -53,7 +53,8 @@ export default function ProfilePage() {
       weight: 70,
       fitnessGoal: 'build_muscle',
       fitnessLevel: 'beginner',
-      trainingDays: '3',
+      availableDays: ['monday', 'wednesday', 'friday'],
+      splitPreference: 'recommended',
       sessionDuration: '60 min',
       trainingLocation: 'Gym',
       equipmentAvailable: ['Dumbbell', 'Bodyweight'],
@@ -79,7 +80,8 @@ export default function ProfilePage() {
   // Watch fields for conditional UI styling
   const watchedGoal = watch('fitnessGoal');
   const watchedExperience = watch('fitnessLevel');
-  const watchedDays = watch('trainingDays');
+  const watchedAvailableDays = watch('availableDays') || [];
+  const watchedSplitPref = watch('splitPreference');
   const watchedDuration = watch('sessionDuration');
   const watchedLocation = watch('trainingLocation');
   const watchedEquipment = watch('equipmentAvailable') || [];
@@ -131,7 +133,8 @@ export default function ProfilePage() {
             weight: Number(profile.weight) || 70,
             fitnessGoal: profile.fitness_goal || 'build_muscle',
             fitnessLevel: profile.fitness_level || 'beginner',
-            trainingDays: metadata.training_days || '3',
+            availableDays: metadata.available_days || ['monday', 'wednesday', 'friday'],
+            splitPreference: metadata.split_preference || 'recommended',
             sessionDuration: metadata.session_duration || '60 min',
             trainingLocation: metadata.training_location || 'Gym',
             equipmentAvailable: metadata.equipment_available || ['Dumbbell', 'Bodyweight'],
@@ -168,7 +171,7 @@ export default function ProfilePage() {
       toast.error('Please acknowledge the safety disclaimer before generating your plan.');
       return;
     }
-    setStep((prev) => Math.min(prev + 1, 7));
+    setStep((prev) => Math.min(prev + 1, 8));
   };
 
   const handleBack = () => {
@@ -189,7 +192,7 @@ export default function ProfilePage() {
   const onSubmit = async (formData) => {
     if (!user) return;
     setGeneratingPlans(true);
-    setStep(7); // Jump to loading state visual
+    setStep(8); // Jump to loading state visual
 
     try {
       // Simulate delay for premium feel
@@ -210,7 +213,8 @@ export default function ProfilePage() {
         dietary_preference: formData.dietaryPreference,
         health_conditions: formData.injuryDetails || formData.medicalDetails || 'None',
         metadata: {
-          training_days: formData.trainingDays,
+          available_days: formData.availableDays,
+          split_preference: formData.splitPreference,
           session_duration: formData.sessionDuration,
           training_location: formData.trainingLocation,
           equipment_available: formData.equipmentAvailable,
@@ -315,13 +319,13 @@ export default function ProfilePage() {
     '04 Nutrition',
     '05 Lifestyle',
     '06 Safety',
-    '07 Your Plan'
+    '07 Preview', '08 Your Plan'
   ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-16">
       {/* Onboarding progress steps header */}
-      {step < 7 && (
+      {step < 8 && (
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
@@ -363,7 +367,7 @@ export default function ProfilePage() {
       )}
 
       {/* Onboarding Card */}
-      {step < 7 && (
+      {step < 8 && (
         <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-6">
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* STEP 1: ABOUT YOU */}
@@ -485,7 +489,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-6">
                   {/* Experience & Days */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase">Training Experience</label>
                       <select
@@ -498,20 +502,55 @@ export default function ProfilePage() {
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase">Training Frequency (Days/Week)</label>
-                      <div className="flex gap-1.5 mt-2 bg-gray-950 p-1 rounded-xl border border-gray-800">
-                        {['2', '3', '4', '5', '6'].map((d) => (
-                          <button
-                            key={d}
-                            type="button"
-                            onClick={() => setValue('trainingDays', d)}
-                            className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${
-                              watchedDays === d ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
-                            }`}
-                          >
-                            {d}
-                          </button>
+                    <div className="col-span-full">
+                      <label className="block text-xs font-bold text-gray-400 uppercase">Select Available Training Days</label>
+                      <div className="grid grid-cols-7 gap-1 mt-2 bg-gray-950 p-1.5 rounded-xl border border-gray-800">
+                        {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((d) => {
+                          const isSelected = watchedAvailableDays.includes(d);
+                          return (
+                            <button
+                              key={d}
+                              type="button"
+                              onClick={() => {
+                                const current = [...watchedAvailableDays];
+                                if (current.includes(d)) {
+                                  setValue('availableDays', current.filter(day => day !== d));
+                                } else {
+                                  setValue('availableDays', [...current, d]);
+                                }
+                              }}
+                              className={`text-center py-2.5 rounded-lg text-xs font-bold capitalize transition-all ${
+                                isSelected ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                              }`}
+                            >
+                              {d.substring(0,3)}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="col-span-full">
+                      <label className="block text-xs font-bold text-gray-400 uppercase">Preferred Training Split</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                        {[
+                          { id: 'recommended', label: 'Recommended For Me ⭐' },
+                          { id: 'full_body', label: 'Full Body' },
+                          { id: 'upper_lower', label: 'Upper / Lower' },
+                          { id: 'ppl', label: 'Push / Pull / Legs' }
+                        ].map((split) => (
+                           <button
+                             key={split.id}
+                             type="button"
+                             onClick={() => setValue('splitPreference', split.id)}
+                             className={`py-3 px-2 text-center text-xs font-bold rounded-xl border transition-all ${
+                               watchedSplitPref === split.id
+                                 ? 'border-orange-500 bg-orange-500/10 text-white shadow-sm'
+                                 : 'border-gray-800 bg-gray-950 text-gray-400 hover:border-gray-700 hover:text-white'
+                             }`}
+                           >
+                             {split.label}
+                           </button>
                         ))}
                       </div>
                     </div>
@@ -877,6 +916,45 @@ export default function ProfilePage() {
               </div>
             )}
 
+                        {/* STEP 7: PREVIEW */}
+            {step === 7 && (
+              <div className="space-y-6">
+                <div className="border-b border-gray-850 pb-4">
+                  <h3 className="text-xl font-bold text-white flex items-center">
+                    <Eye className="h-5.5 w-5.5 text-orange-500 mr-2" />
+                    Program Architecture Preview
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-1">Review the structure we've chosen based on your inputs.</p>
+                </div>
+
+                <div className="bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-xs font-medium text-gray-300">
+                    <div><span className="text-gray-500 block">Goal</span><span className="capitalize">{watchedGoal.replace('_', ' ')}</span></div>
+                    <div><span className="text-gray-500 block">Experience</span><span className="capitalize">{watchedExperience}</span></div>
+                    <div><span className="text-gray-500 block">Training Days</span>{watchedAvailableDays.length} Days</div>
+                    <div><span className="text-gray-500 block">Preferred Split</span><span className="capitalize">{watchedSplitPref.replace('_', ' ')}</span></div>
+                    <div><span className="text-gray-500 block">Priority</span><span className="capitalize">{watch('priorityMuscle')}</span></div>
+                    <div><span className="text-gray-500 block">Duration</span>{watchedDuration}</div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-850">
+                    <h4 className="text-sm font-bold text-white mb-3">Weekly Blueprint</h4>
+                    <div className="space-y-2">
+                      {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                        const isTrainingDay = watchedAvailableDays.includes(day);
+                        return (
+                          <div key={day} className={`flex justify-between p-3 rounded-xl text-xs ${isTrainingDay ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : 'bg-gray-900 border border-gray-850 text-gray-500'}`}>
+                            <span className="font-bold capitalize">{day.substring(0,3)}</span>
+                            <span className="font-medium">{isTrainingDay ? 'Training Day (Auto-scheduled)' : 'Rest / Recovery'}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Wizard Navigation Action Controls */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-850">
               {step > 1 ? (
@@ -892,7 +970,7 @@ export default function ProfilePage() {
                 <div />
               )}
 
-              {step < 6 ? (
+              {step < 7 ? (
                 <button
                   type="button"
                   onClick={handleNext}
@@ -916,7 +994,7 @@ export default function ProfilePage() {
       )}
 
       {/* STEP 7: PREMIUM GENERATION ANIMATION SCREEN */}
-      {step === 7 && (
+      {step === 8 && (
         <div className="min-h-[50vh] flex flex-col justify-center items-center text-center space-y-8 max-w-md mx-auto py-12 animate-fade-in">
           <div className="relative h-20 w-20 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border-4 border-orange-500/20 border-t-orange-500 animate-spin" />
@@ -934,7 +1012,7 @@ export default function ProfilePage() {
               <span>100%</span>
             </div>
             <div className="flex items-center justify-between text-green-400">
-              <span>✓ Customizing {watchedDays}-day split split</span>
+              <span>✓ Customizing {watchedAvailableDays ? watchedAvailableDays.length : 3}-day split split</span>
               <span>100%</span>
             </div>
             <div className="flex items-center justify-between text-green-400">

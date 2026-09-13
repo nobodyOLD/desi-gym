@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
  * and activity level multipliers, then queries Gemini for meal plans.
  */
 export async function POST(req) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
   try {

@@ -13,6 +13,7 @@ import {
   MessageSquare,
   LogOut,
   Sparkles,
+  BookOpen
 } from 'lucide-react';
 
 export default function Sidebar({ user, profile }) {
@@ -36,6 +37,7 @@ export default function Sidebar({ user, profile }) {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'My Profile', href: '/dashboard/profile', icon: User },
     { name: 'Workout Plan', href: '/dashboard/workout', icon: Dumbbell },
+    { name: 'Exercise Library', href: '/dashboard/library', icon: BookOpen },
     { name: 'Nutrition Plan', href: '/dashboard/nutrition', icon: Apple },
     { name: 'Progress Logs', href: '/dashboard/progress', icon: LineChart },
     { name: 'Weekly Review', href: '/dashboard/weekly-review', icon: Sparkles },
