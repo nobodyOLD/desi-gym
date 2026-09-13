@@ -193,7 +193,7 @@ export default function WorkoutBuilder() {
         <div className="lg:col-span-2 space-y-4">
           
           <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
-            {['Push', 'Pull', 'Legs', 'Upper', 'Lower', 'Full Body', 'Custom'].map(t => (
+            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(t => (
               <button 
                 key={t}
                 onClick={() => setWorkoutType(t.toLowerCase())}
