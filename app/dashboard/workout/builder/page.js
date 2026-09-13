@@ -39,10 +39,30 @@ export default function WorkoutBuilder() {
         .from('profiles').select('*').eq('id', session.user.id).single();
       
       setProfile(userProfile);
+
+      if (assignToDay) {
+        const { data: wpData } = await supabase
+          .from('workout_plans')
+          .select('plan_data')
+          .eq('user_id', userProfile.id)
+          .eq('is_active', true)
+          .maybeSingle();
+          
+        if (wpData && wpData.plan_data?.weekly_schedule?.week1?.[assignToDay]) {
+          const dayData = wpData.plan_data.weekly_schedule.week1[assignToDay];
+          if (dayData.exercises && dayData.exercises.length > 0) {
+            setExercises(dayData.exercises);
+            if (dayData.muscle_group) {
+              setWorkoutType(dayData.muscle_group.toLowerCase());
+            }
+          }
+        }
+      }
+
       setLoading(false);
     }
     loadData();
-  }, [router]);
+  }, [router, assignToDay]);
 
   const fetchLibrary = async () => {
     setLibraryOpen(true);
