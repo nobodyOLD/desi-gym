@@ -157,7 +157,7 @@ export default function WorkoutBuilder() {
   const analysis = analyzeWorkout(exercises);
 
   const filteredLibrary = libraryData.filter(ex => {
-    if (muscleFilter !== 'All' && !ex.primary_muscles.includes(muscleFilter)) return false;
+    if (muscleFilter !== 'All' && !ex.primary_muscles.includes(muscleFilter.toLowerCase())) return false;
     if (searchQuery && !ex.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });

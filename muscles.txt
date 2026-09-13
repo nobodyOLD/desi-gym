@@ -1,0 +1,1 @@
+chest\nfront_delts\ntriceps\nback_lats\nback_upper\nbiceps\ncore_anti_extension\nglutes\nhamstrings\nside_delts\nrear_delts\nquads\ncalves\ncore_flexion\ncore_anti_rotation\nunknown
